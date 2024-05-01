@@ -31,16 +31,13 @@ app.get('/api/hello', function (req, res) {
 // handle GET requests to /api/shorturl/:shorturl
 app.get('/api/shorturl/:shorturl', function (req, res) {
   const index = req.params.shorturl
-  console.log({ Shorturl_index: index})
-
   // use 'index' to find original url in map
   const redirectUrl = shortUrlArray[index]
   // redirect to original url
-  console.log({ redirecting_to: redirectUrl })
   res.redirect(redirectUrl)
 })
 
-// POST to /api/shorturl
+// handle POST request to /api/shorturl
 app.post('/api/shorturl', function (req, res) {
   let parsedUrl = ''
   const originalUrl = req.body.url
@@ -54,20 +51,15 @@ app.post('/api/shorturl', function (req, res) {
     dns.lookup(parsedUrl.hostname, (error, address, family) => {
       if (error) {
         	// if it breaks
-        	console.log({ error: 'invalid url' })
         	res.json({ error: 'invalid url' })
       } else {
-        	// proceed with adding the url to an array
+        // proceed with adding the url to the global array
         shortUrlArray.push(originalUrl)
-        console.log('Array length: ', shortUrlArray.length)
-
-        console.log({ original_url: req.body.url, short_url: 1 })
-        res.json({ original_url: req.body.url, short_url: 1 })
+        // send back json
+        res.json({ original_url: originalUrl, short_url: shortUrlArray.lastIndexOf(originalUrl) })
       }
     })
   }
-
-  // send back the JSON
 })
 
 app.listen(port, function () {
